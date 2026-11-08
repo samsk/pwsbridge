@@ -1,0 +1,54 @@
+name: "pwsbridge"
+description: "Pluggable weather station ingest (WU/Ecowitt) to MQTT, Prometheus, and more"
+version: "0.1.0"
+slug: pwsbridge
+url: "https://github.com/samsk/pwsbridge"
+arch:
+  - aarch64
+  - amd64
+  - armhf
+  - armv7
+startup: application
+boot: auto
+init: false
+ports:
+  8080/tcp: 8080
+ports_description:
+  8080/tcp: "pwsbridge listen port (map host 80 to this when DNS-hijacking WU on port 80)"
+services:
+  - mqtt:want
+options:
+  listen: ":8080"
+  log_level: "info"
+  auth_mode: "password"
+  station_id: ""
+  station_password: ""
+  station_passkey: ""
+  mqtt_broker: ""
+  mqtt_username: ""
+  mqtt_password: ""
+  mqtt_discovery_prefix: "homeassistant"
+  prometheus: true
+  forward_wu: false
+  forward_resolver: "1.1.1.1:53"
+  rate_limit: "2s"
+  stale_timeout: "300s"
+  derived: false
+schema:
+  listen: str
+  log_level: "list(debug|info|warning|error)"
+  auth_mode: "list(open|password)"
+  station_id: str
+  station_password: password
+  station_passkey: str
+  mqtt_broker: str
+  mqtt_username: str
+  mqtt_password: password
+  mqtt_discovery_prefix: str
+  prometheus: bool
+  forward_wu: bool
+  forward_resolver: str
+  rate_limit: str
+  stale_timeout: str
+  derived: bool
+stage: experimental

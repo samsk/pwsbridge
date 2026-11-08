@@ -1,0 +1,27 @@
+configuration:
+  listen:
+    name: Listen address
+  log_level:
+    name: Log level
+  auth_mode:
+    name: Auth mode
+  station_id:
+    name: Station ID
+    description: Public id (WU ID / Home Assistant device name)
+  station_password:
+    name: Station password
+    description: WU password; also default Ecowitt PASSKEY
+  station_passkey:
+    name: Ecowitt PASSKEY override
+    description: Set only when device PASSKEY differs from WU password
+  mqtt_broker:
+    name: MQTT broker URL
+  forward_wu:
+    name: Forward to Weather Underground
+    description: Default off; pauses on site refusal
+  derived:
+    name: Derived metrics
+  rate_limit:
+    name: Rate limit
+  stale_timeout:
+    name: Stale timeout

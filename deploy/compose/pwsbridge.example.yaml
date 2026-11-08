@@ -1,0 +1,26 @@
+listen: ":8080"
+auth_mode: password
+data_dir: /data
+tenants:
+  - id: home
+    derived: false
+    stations:
+      - id: FT0300
+        password: station-key   # WU PASSWORD; also Ecowitt PASSKEY unless passkey: is set
+        # passkey: eco-only     # optional override when PASSKEY != WU password
+        protocols: [wu, ecowitt]
+    sinks: [ha, prom]
+    fanouts: [wu]
+sinks:
+  ha:
+    type: mqtt
+    broker: tcp://mosquitto:1883
+    discovery_prefix: homeassistant
+  prom:
+    type: prometheus
+fanouts:
+  wu:
+    type: http
+    url_host: rtupdate.wunderground.com
+    resolver: dot
+    resolver_addr: 1.1.1.1:53

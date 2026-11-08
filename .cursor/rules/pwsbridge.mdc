@@ -1,0 +1,20 @@
+---
+description: pwsbridge Go service conventions
+globs: "**/*.{go,yml,yaml,md}"
+alwaysApply: false
+---
+
+# pwsbridge rules
+
+- Keep SI inside the process; convert only in `internal/units`.
+- Reply `success\n` only after accept. Sink and fanout errors never change the station body.
+- Never log `PASSWORD`, `PASSKEY`, or `key`.
+- Ecowitt PASSKEY matches station `password` by default; optional `passkey` overrides.
+- Cloud fanout must use the injected public resolver; never `net.DefaultResolver` or `net.LookupIP`.
+- New ingress protocol → new package under `internal/ingress/`.
+- New output → new `Sink`; do not edit ingress.
+- Soft cap ~200 lines per file. Document exported functions (purpose, inputs, outputs).
+- Env (`PWSBRIDGE_*`) for one station. YAML only with `PWSBRIDGE_CONFIG`.
+- Derived metrics off by default; per-tenant opt-in.
+- Origin bugs need named negative tests from the plan before the fix counts as done.
+- Prefer `docker compose` for build/test when Docker is available.

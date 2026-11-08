@@ -1,0 +1,82 @@
+services:
+  pwsbridge:
+    build:
+      context: ../..
+      dockerfile: Dockerfile
+    environment:
+      PWSBRIDGE_LISTEN: ":8080"
+      PWSBRIDGE_LOG_LEVEL: info
+      PWSBRIDGE_AUTH_MODE: password
+      PWSBRIDGE_STATION_ID: test
+      PWSBRIDGE_STATION_PASSWORD: testtest
+      PWSBRIDGE_MQTT_BROKER: tcp://mosquitto:1883
+      PWSBRIDGE_MQTT_DISCOVERY_PREFIX: homeassistant
+      PWSBRIDGE_PROMETHEUS: "true"
+      PWSBRIDGE_FORWARD_WU: "true"
+      PWSBRIDGE_FORWARD_RESOLVER: "1.1.1.1:53"
+      PWSBRIDGE_RATE_LIMIT: 2s
+      PWSBRIDGE_STALE_TIMEOUT: 300s
+      PWSBRIDGE_DERIVED: "false"
+      PWSBRIDGE_SQLITE_PATH: /data/pwsbridge.db
+      PWSBRIDGE_DATA_DIR: /data
+    ports:
+      - "8080:8080"
+      # Map host 80 -> 8080 when a station needs port 80 (no CAP_NET_BIND_SERVICE).
+      # - "80:8080"
+    volumes:
+      - pwsdata:/data
+    tmpfs:
+      - /tmp
+    read_only: true
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    pids_limit: 64
+    mem_limit: 128m
+    depends_on:
+      - mosquitto
+    restart: unless-stopped
+
+  mosquitto:
+    image: eclipse-mosquitto:2
+    ports:
+      - "127.0.0.1:1883:1883"
+    volumes:
+      - ./mosquitto.conf:/mosquitto/config/mosquitto.conf:ro
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+
+  mock-wu:
+    build: ./mock-wu
+    networks:
+      default:
+        aliases:
+          - rtupdate.wunderground.com
+
+  test:
+    image: golang:1.26
+    working_dir: /src
+    volumes:
+      - ../..:/src
+    command: ["go", "test", "./..."]
+    profiles: ["test"]
+
+  e2e:
+    image: golang:1.26
+    working_dir: /src
+    volumes:
+      - ../..:/src
+    environment:
+      PWSBRIDGE_E2E_URL: http://pwsbridge:8080
+      PWSBRIDGE_MQTT_BROKER: tcp://mosquitto:1883
+    command: ["go", "test", "./deploy/compose/e2e/..."]
+    depends_on:
+      - pwsbridge
+      - mosquitto
+    profiles: ["e2e"]
+
+volumes:
+  pwsdata:

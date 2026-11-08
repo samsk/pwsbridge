@@ -1,0 +1,35 @@
+#!/usr/bin/with-contenv bashio
+set -e
+
+export PWSBRIDGE_LISTEN="$(bashio::config 'listen')"
+export PWSBRIDGE_LOG_LEVEL="$(bashio::config 'log_level')"
+export PWSBRIDGE_AUTH_MODE="$(bashio::config 'auth_mode')"
+export PWSBRIDGE_STATION_ID="$(bashio::config 'station_id')"
+export PWSBRIDGE_STATION_PASSWORD="$(bashio::config 'station_password')"
+if bashio::config.has_value 'station_passkey'; then
+  export PWSBRIDGE_STATION_PASSKEY="$(bashio::config 'station_passkey')"
+fi
+export PWSBRIDGE_MQTT_DISCOVERY_PREFIX="$(bashio::config 'mqtt_discovery_prefix')"
+export PWSBRIDGE_PROMETHEUS="$(bashio::config 'prometheus')"
+export PWSBRIDGE_FORWARD_WU="$(bashio::config 'forward_wu')"
+export PWSBRIDGE_FORWARD_RESOLVER="$(bashio::config 'forward_resolver')"
+export PWSBRIDGE_RATE_LIMIT="$(bashio::config 'rate_limit')"
+export PWSBRIDGE_STALE_TIMEOUT="$(bashio::config 'stale_timeout')"
+export PWSBRIDGE_DERIVED="$(bashio::config 'derived')"
+
+if bashio::config.has_value 'mqtt_broker'; then
+  export PWSBRIDGE_MQTT_BROKER="$(bashio::config 'mqtt_broker')"
+elif bashio::services.available mqtt; then
+  export PWSBRIDGE_MQTT_BROKER="tcp://$(bashio::services mqtt host):$(bashio::services mqtt port)"
+  export PWSBRIDGE_MQTT_USERNAME="$(bashio::services mqtt username)"
+  export PWSBRIDGE_MQTT_PASSWORD="$(bashio::services mqtt password)"
+fi
+
+if bashio::config.has_value 'mqtt_username'; then
+  export PWSBRIDGE_MQTT_USERNAME="$(bashio::config 'mqtt_username')"
+fi
+if bashio::config.has_value 'mqtt_password'; then
+  export PWSBRIDGE_MQTT_PASSWORD="$(bashio::config 'mqtt_password')"
+fi
+
+exec s6-setuidgid nobody /usr/bin/pwsbridge

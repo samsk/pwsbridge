@@ -1,0 +1,1 @@
+ID=test&PASSWORD=testtest&action=updateraw&realtime=1&rtfreq=5&dateutc=now&baromin=29.65&tempf=63.5&dewptf=51.2&humidity=64&windspeedmph=4.4&windgustmph=4.9&winddir=270&rainin=0.0&dailyrainin=0.0&indoortempf=73.5&indoorhumidity=44
